@@ -1,0 +1,213 @@
+﻿@page "/product/edit/{id:int}"
+@rendermode InteractiveServer
+@using DataAccess.Models
+@using BusinessObject.Services
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Forms
+@inject ProductService ProductService
+@inject CategoryService CategoryService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit Product</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Edit Product</h1>
+        <button type="button" class="btn btn-secondary" @onclick="BackToList">Back to List</button> <!-- Thêm type="button" -->
+    </div>
+
+    @if (loading)
+    {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (product == null)
+    {
+        <div class="alert alert-danger">
+            Product not found.
+        </div>
+    }
+    else
+    {
+        <div class="card">
+            <div class="card-body">
+                <EditForm Model="@product" OnSubmit="@HandleSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mb-3">
+                        <label class="form-label">Product Name <span class="text-danger">*</span></label>
+                        <InputText class="form-control" @bind-Value="product.ProductName" />
+                        <ValidationMessage For="@(() => product.ProductName)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Weight</label>
+                        <InputText class="form-control" @bind-Value="product.Weight" />
+                        <ValidationMessage For="@(() => product.Weight)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Unit Price <span class="text-danger">*</span></label>
+                        <InputNumber class="form-control" @bind-Value="product.UnitPrice" />
+                        <ValidationMessage For="@(() => product.UnitPrice)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Units In Stock <span class="text-danger">*</span></label>
+                        <InputNumber class="form-control" @bind-Value="product.UnitsInStock" />
+                        <ValidationMessage For="@(() => product.UnitsInStock)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Category <span class="text-danger">*</span></label>
+                        <InputSelect class="form-select" @bind-Value="product.CategoryId">
+                            <option value="0">Select a category...</option>
+                            @foreach (var category in categories)
+                            {
+                                <option value="@category.CategoryId">@category.CategoryName</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="@(() => product.CategoryId)" />
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </EditForm>
+
+                @if (errorMessages.Any())
+                {
+                    <div class="alert alert-danger mt-3">
+                        <ul>
+                            @foreach (var error in errorMessages)
+                            {
+                                <li>@error</li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Product product;
+    private IEnumerable<Category> categories = new List<Category>();
+    private bool loading = true;
+    private List<string> errorMessages = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ProductService == null || CategoryService == null)
+        {
+            errorMessages.Add("Database service is unavailable.");
+            loading = false;
+            return;
+        }
+
+        await LoadCategories();
+        await LoadProduct();
+        loading = false;
+    }
+
+    private async Task LoadCategories()
+    {
+        try
+        {
+
+            categories = await CategoryService.GetAllCategoriesAsync();
+
+        }
+        catch (Exception ex)
+        {
+            errorMessages.Add($"Error while Loading product: {ex.Message}");
+        }
+    }
+
+    private async Task LoadProduct()
+    {
+        try
+        {
+
+            product =  ProductService.GetProductById(Id);
+
+            if (product == null)
+            {
+                errorMessages.Add($"No products found with ID {Id}.");
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessages.Add($"Error loading product: {ex.Message}");
+        }
+    }
+
+    private async Task HandleSubmit(EditContext editContext)
+    {
+        errorMessages.Clear(); 
+
+       
+        if (!editContext.Validate())
+        {
+            var messages = editContext.GetValidationMessages();
+            errorMessages.AddRange(messages);
+            return;
+        }
+
+       
+        if (string.IsNullOrEmpty(product.ProductName))
+        {
+            errorMessages.Add("Product name cannot be blank.");
+        }
+        if (string.IsNullOrEmpty(product.Weight))
+        {
+            errorMessages.Add("Product Weight cannot be blank.");
+        }
+        if (product.UnitPrice <= 0)
+        {
+            errorMessages.Add("Unit price must be greater than 0.");
+        }
+
+        if (product.UnitsInStock <= 0)
+        {
+            errorMessages.Add("Inventory quantity must be greater than 0.");
+        }
+
+        if (product.CategoryId == 0)
+        {
+            errorMessages.Add("Please select a category.");
+        }
+
+       
+        if (errorMessages.Any())
+        {
+            return;
+        }
+
+        
+        try
+        {
+
+            await ProductService.UpdateProductAsync(product);
+
+            NavigationManager.NavigateTo("/product");
+        }
+        catch (Exception ex)
+        {
+            errorMessages.Add($"Error while updating product: {ex.Message}");
+        }
+    }
+
+    private void BackToList()
+    {
+        NavigationManager.NavigateTo("/product");
+    }
+}

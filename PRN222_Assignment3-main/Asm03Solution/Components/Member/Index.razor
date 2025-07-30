@@ -1,0 +1,189 @@
+@page "/member"
+@rendermode InteractiveServer
+@using DataAccess.Models
+@using BusinessObject.Services.Instance
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Http
+@inject IMemberService MemberService
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject IHttpContextAccessor HttpContextAccessor
+
+<PageTitle>Members</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Members</h1>
+        <button class="btn btn-primary" @onclick="CreateNewMember">Create New</button>
+    </div>
+
+    @if (loading)
+    {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (members == null || !members.Any())
+    {
+        <div class="alert alert-info">
+            No members found.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Email</th>
+                        <th>Company Name</th>
+                        <th>City</th>
+                        <th>Country</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var member in pagedMembers)
+                    {
+                        <tr>
+                            <td>@member.Email</td>
+                            <td>@member.CompanyName</td>
+                            <td>@member.City</td>
+                            <td>@member.Country</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm me-1" @onclick="() => EditMember(member.MemberId)">Edit</button>
+                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteMember(member.MemberId)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-center mt-3">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <button class="page-link" @onclick="PreviousPage">Trước</button>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        var pageNumber = i;
+                        <li class="page-item @(pageNumber == currentPage ? "active" : "")">
+                            <button class="page-link" @onclick="() => GoToPage(pageNumber)">@pageNumber</button>
+                        </li>
+                    }
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <button class="page-link" @onclick="NextPage">Sau</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="text-center">
+            <small>Hiển thị @pagedMembers.Count() / @members.Count() thành viên</small>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">@errorMessage</div>
+    }
+</div>
+
+@code {
+    private IEnumerable<Member> members;
+    private IEnumerable<Member> pagedMembers;
+    private bool loading = true;
+    private string errorMessage;
+    
+    // Phân trang
+    private int pageSize = 3;
+    private int currentPage = 1;
+    private int totalPages => members == null ? 0 : (int)Math.Ceiling(members.Count() / (double)pageSize);
+
+    protected override async Task OnInitializedAsync()
+    {    
+        await LoadMembers();
+    }
+
+    private async Task LoadMembers()
+    {
+        loading = true;
+        try
+        {
+            members = await MemberService.GetAllMembersAsync();
+            UpdatePagedMembers();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading members: {ex.Message}";
+        }
+        finally
+        {
+            loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void UpdatePagedMembers()
+    {
+        pagedMembers = members
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    private void GoToPage(int page)
+    {
+        currentPage = page;
+        UpdatePagedMembers();
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            UpdatePagedMembers();
+        }
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            UpdatePagedMembers();
+        }
+    }
+
+    private async Task CheckAuthentication()
+    {
+        try
+        {
+            var email = HttpContextAccessor.HttpContext?.Session.GetString("Email");
+            // Kiểm tra nếu không phải admin thì chuyển hướng
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error checking authentication: {ex.Message}";
+        }
+    }
+
+    private void CreateNewMember()
+    {
+        NavigationManager.NavigateTo("/member/add");
+    }
+
+    private void EditMember(int id)
+    {
+        NavigationManager.NavigateTo($"/member/edit/{id}");
+    }
+
+    private void DeleteMember(int id)
+    {
+        NavigationManager.NavigateTo($"/member/delete/{id}");
+    }
+} 

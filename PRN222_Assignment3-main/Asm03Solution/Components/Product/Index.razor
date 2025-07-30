@@ -1,0 +1,199 @@
+@page "/product"
+@rendermode InteractiveServer
+@using DataAccess.Models
+@using BusinessObject.Services
+@using Microsoft.AspNetCore.Components
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject ProductService ProductService
+@inject CategoryService CategoryService
+
+
+<PageTitle>Products</PageTitle>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Products</h1>
+        <button class="btn btn-primary" @onclick="CreateNewProduct">Create New</button>
+    </div>
+
+    @if (loading)
+    {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (products == null || !products.Any())
+    {
+        <div class="alert alert-info">
+            No products found.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Weight</th>
+                        <th>Unit Price</th>
+                        <th>Units In Stock</th>
+                        <th>Category</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in pagedProducts)
+                    {
+                        <tr>
+                            <td>@product.ProductName</td>
+                            <td>@product.Weight</td>
+                            <td>@product.UnitPrice.ToString("C")</td>
+                            <td>@product.UnitsInStock</td>
+                            <td>@(product.Category?.CategoryName ?? "N/A")</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm me-1" @onclick="() => EditProduct(product.ProductId)">Edit</button>
+                                <button class="btn btn-danger btn-sm" @onclick="() => DeleteProduct(product.ProductId)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="d-flex justify-content-center mt-3">
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                        <button class="page-link" @onclick="PreviousPage">Trước</button>
+                    </li>
+                    @for (int i = 1; i <= totalPages; i++)
+                    {
+                        var pageNumber = i;
+                        <li class="page-item @(pageNumber == currentPage ? "active" : "")">
+                            <button class="page-link" @onclick="() => GoToPage(pageNumber)">@pageNumber</button>
+                        </li>
+                    }
+                    <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                        <button class="page-link" @onclick="NextPage">Sau</button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="text-center">
+            <small>Hiển thị @pagedProducts.Count() / @products.Count() sản phẩm</small>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-3">@errorMessage</div>
+    }
+</div>
+
+@code {
+    private IEnumerable<Product> products;
+    private IEnumerable<Product> pagedProducts;
+    private bool loading = true;
+    private bool isAuthenticated = false;
+    private string errorMessage;
+    
+    // Phân trang
+    private int pageSize = 3;
+    private int currentPage = 1;
+    private int totalPages => products == null ? 0 : (int)Math.Ceiling(products.Count() / (double)pageSize);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        loading = true;
+        try
+        {
+            if (ProductService == null || CategoryService == null)
+            {
+                errorMessage = "Service unavailable.";
+                loading = false;
+                return;
+            }
+
+
+            products = ProductService.GetAllProductsAsync();
+            var categoriesDict = (await CategoryService.GetAllCategoriesAsync())?.ToDictionary(c => c.CategoryId) ?? new Dictionary<int, Category>();
+
+
+            foreach (var product in products)
+            {
+                if (categoriesDict.ContainsKey(product.CategoryId))
+                {
+                    product.Category = categoriesDict[product.CategoryId];
+                }
+            }
+            
+            UpdatePagedProducts();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading product: {ex.Message}";
+        }
+        finally
+        {
+            loading = false;
+            StateHasChanged();
+        }
+    }
+    
+    private void UpdatePagedProducts()
+    {
+        pagedProducts = products
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+    }
+
+    private void GoToPage(int page)
+    {
+        currentPage = page;
+        UpdatePagedProducts();
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            UpdatePagedProducts();
+        }
+    }
+
+    private void NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            UpdatePagedProducts();
+        }
+    }
+
+    private void CreateNewProduct()
+    {
+        NavigationManager.NavigateTo("/product/add");
+    }
+
+    private void EditProduct(int id)
+    {
+        NavigationManager.NavigateTo($"/product/edit/{id}");
+    }
+
+    private void DeleteProduct(int id)
+    {
+        NavigationManager.NavigateTo($"/product/delete/{id}");
+    }
+   
+}
