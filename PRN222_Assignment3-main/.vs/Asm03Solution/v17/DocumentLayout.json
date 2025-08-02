@@ -1,13 +1,13 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\Admin\\Desktop\\PRN222_Assignment3\\PRN222_Assignment3-main\\",
+  "WorkspaceRootPath": "C:\\Users\\Admin\\Documents\\GitHub\\AS3\\PRN222_Assignment3-main\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{D4CD2D0F-ECC9-49E4-A34B-F18C3DD8450F}|DataAccess\\DataAccess.csproj|c:\\users\\admin\\desktop\\prn222_assignment3\\prn222_assignment3-main\\dataaccess\\models\\product.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{D4CD2D0F-ECC9-49E4-A34B-F18C3DD8450F}|DataAccess\\DataAccess.csproj|c:\\users\\admin\\documents\\github\\as3\\prn222_assignment3-main\\dataaccess\\models\\product.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D4CD2D0F-ECC9-49E4-A34B-F18C3DD8450F}|DataAccess\\DataAccess.csproj|solutionrelative:dataaccess\\models\\product.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D4CD2D0F-ECC9-49E4-A34B-F18C3DD8450F}|DataAccess\\DataAccess.csproj|c:\\users\\admin\\desktop\\prn222_assignment3\\prn222_assignment3-main\\dataaccess\\models\\cartitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{D4CD2D0F-ECC9-49E4-A34B-F18C3DD8450F}|DataAccess\\DataAccess.csproj|c:\\users\\admin\\documents\\github\\as3\\prn222_assignment3-main\\dataaccess\\models\\cartitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{D4CD2D0F-ECC9-49E4-A34B-F18C3DD8450F}|DataAccess\\DataAccess.csproj|solutionrelative:dataaccess\\models\\cartitem.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -64,11 +64,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Product.cs",
-              "DocumentMoniker": "C:\\Users\\Admin\\Desktop\\PRN222_Assignment3\\PRN222_Assignment3-main\\DataAccess\\Models\\Product.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GitHub\\AS3\\PRN222_Assignment3-main\\DataAccess\\Models\\Product.cs",
               "RelativeDocumentMoniker": "DataAccess\\Models\\Product.cs",
-              "ToolTip": "C:\\Users\\Admin\\Desktop\\PRN222_Assignment3\\PRN222_Assignment3-main\\DataAccess\\Models\\Product.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\GitHub\\AS3\\PRN222_Assignment3-main\\DataAccess\\Models\\Product.cs",
               "RelativeToolTip": "DataAccess\\Models\\Product.cs",
-              "ViewState": "AgIAABcAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAABcAAAAAAAAAAAAgwCgAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-26T06:56:32Z",
               "EditorCaption": ""
@@ -77,14 +77,13 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "CartItem.cs",
-              "DocumentMoniker": "C:\\Users\\Admin\\Desktop\\PRN222_Assignment3\\PRN222_Assignment3-main\\DataAccess\\Models\\CartItem.cs",
+              "DocumentMoniker": "C:\\Users\\Admin\\Documents\\GitHub\\AS3\\PRN222_Assignment3-main\\DataAccess\\Models\\CartItem.cs",
               "RelativeDocumentMoniker": "DataAccess\\Models\\CartItem.cs",
-              "ToolTip": "C:\\Users\\Admin\\Desktop\\PRN222_Assignment3\\PRN222_Assignment3-main\\DataAccess\\Models\\CartItem.cs",
+              "ToolTip": "C:\\Users\\Admin\\Documents\\GitHub\\AS3\\PRN222_Assignment3-main\\DataAccess\\Models\\CartItem.cs",
               "RelativeToolTip": "DataAccess\\Models\\CartItem.cs",
               "ViewState": "AgIAAAMAAAAAAAAAAAAAAAwAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-26T06:56:16.633Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-26T06:56:16.633Z"
             }
           ]
         },
@@ -98,11 +97,11 @@
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
             },
             {
               "$type": "Bookmark",
-              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
             }
           ]
         }
